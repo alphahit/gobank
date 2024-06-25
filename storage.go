@@ -8,20 +8,20 @@ import (
 
 // Storage defines the interface for account storage operations. This abstraction allows for easy testing and future storage implementations.
 type Storage interface {
-	CreateAccount(*Account) error     // CreateAccount inserts a new account into the store.
-	DeleteAccount(int) error          // DeleteAccount removes an account by its ID.
-	UpdateAccount(*Account) error     // UpdateAccount modifies an existing account.
-	GetAccount(int) (*Account, error) // GetAccount retrieves an account by its ID.
+	CreateAccount(*Account) error         // CreateAccount inserts a new account into the store.
+	DeleteAccount(int) error              // DeleteAccount removes an account by its ID.
+	UpdateAccount(*Account) error         // UpdateAccount modifies an existing account.
+	GetAccountByID(int) (*Account, error) // GetAccount retrieves an account by its ID.
 }
 
-// PostGreStore holds the connection details to the PostgreSQL database.
-type PostGreStore struct {
+// PostgresStore holds the connection details to the PostgreSQL database.
+type PostgresStore struct {
 	db *sql.DB // db represents a pool of zero or more underlying connections to the database.
 }
 
-// NewPostgresStore initializes a new PostGreStore with a connection to a PostgreSQL database.
+// NewPostgresStore initializes a new PostgresStore with a connection to a PostgreSQL database.
 // It returns the newly created store or an error if the connection or setup fails.
-func NewPostgresStore() (*PostGreStore, error) {
+func NewPostgresStore() (*PostgresStore, error) {
 	connStr := "user=postgres dbname=postgres password=gobank sslmode=disable" // Connection string to connect to the PostgreSQL database.
 	db, err := sql.Open("postgres", connStr)                                   // Open a new database connection.
 
@@ -33,7 +33,37 @@ func NewPostgresStore() (*PostGreStore, error) {
 		return nil, err // Return an error if the connection to the database cannot be verified.
 	}
 
-	return &PostGreStore{
+	return &PostgresStore{
 		db: db, // Initialize PostGreStore with the established database connection.
 	}, nil
+}
+
+func (s *PostgresStore) Init() error {
+	return s.createAccountTable()
+}
+
+func (s *PostgresStore) createAccountTable() error {
+	query := `CREATE TABLE IF NOT EXISTS account (
+        id SERIAL PRIMARY KEY,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(50) NOT NULL,
+        balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );`
+
+	_, err := s.db.Exec(query)
+	return err
+}
+
+func (s *PostgresStore) CreateAccount(*Account) error {
+	return nil
+}
+func (s *PostgresStore) UpdateAccount(*Account) error {
+	return nil
+}
+func (s *PostgresStore) DeleteAccount(id int) error {
+	return nil
+}
+func (s *PostgresStore) GetAccountByID(id int) (*Account, error) {
+	return nil, nil
 }

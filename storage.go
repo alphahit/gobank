@@ -44,12 +44,13 @@ func (s *PostgresStore) Init() error {
 
 func (s *PostgresStore) createAccountTable() error {
 	query := `CREATE TABLE IF NOT EXISTS account (
-        id SERIAL PRIMARY KEY,
-        first_name VARCHAR(50) NOT NULL,
-        last_name VARCHAR(50) NOT NULL,
-        balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );`
+			id SERIAL PRIMARY KEY,
+			first_name VARCHAR(50) NOT NULL,
+			last_name VARCHAR(50) NOT NULL,
+			number SERIAL,
+			balance SERIAL NOT NULL DEFAULT 0.00,
+			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+		);`
 
 	_, err := s.db.Exec(query)
 	return err

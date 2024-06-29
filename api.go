@@ -63,7 +63,15 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 
 // handleCreateAccount handles requests for creating new accounts.
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	createdAccountReq := new(CreateAccountRequest)
+	if err := json.NewDecoder(r.Body).Decode(createdAccountReq); err != nil {
+		return err
+	}
+	account := NewAccount(createdAccountReq.FirstName, createdAccountReq.LastName)
+	if err := s.store.CreateAccount(account); err != nil {
+		return err
+	}
+	return WriteJSON(w, http.StatusOK, createdAccountReq)
 }
 
 // handleDeleteAccount handles requests to delete existing accounts.

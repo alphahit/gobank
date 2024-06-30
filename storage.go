@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/lib/pq" // Import the postgres driver anonymously to initialize it, enabling database/sql to use PostgreSQL.
 )
@@ -56,7 +57,14 @@ func (s *PostgresStore) createAccountTable() error {
 	return err
 }
 
-func (s *PostgresStore) CreateAccount(*Account) error {
+func (s *PostgresStore) CreateAccount(account *Account) error {
+	query := `INSERT INTO account (first_name, last_name, number, balance, created_at)
+	VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	resp, err := s.db.Query(query, account.FirstName, account.LastName, account.Number, account.Balance, account.CreatedAt)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v\n", resp)
 	return nil
 }
 func (s *PostgresStore) UpdateAccount(*Account) error {
